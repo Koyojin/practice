@@ -1,0 +1,8 @@
+#9063
+# import sys
+# _, *plist = map(int, sys.stdin.read().split())
+# print((max(plist[::2])-min(plist[::2]))*(max(plist[1::2])-min(plist[1::2])))
+
+#  '_'는 첫 번째 요소를 무시하는 데 사용되며, *rest는 남은 요소를 리스트로 가져옵니다.
+
+# 원래 코드에서 _, *plist = map(int, sys.stdin.read().split()) 부분은 sys.stdin.read().split()로 읽어들인 데이터를 정수로 변환한 뒤, 첫 번째 값을 무시하고 나머지 값을 plist 리스트에 할당하는 것을 나타냅니다. 이렇게 함으로써 plist에는 입력 데이터의 정수 값들만 들어가게 됩니다.
