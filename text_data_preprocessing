@@ -1,0 +1,60 @@
+NLTK:Natural Language ToolKit 을 활용한다
+import nltk
+1.전처리하고자 하는 문장을 string 변수로 저장
+    sentence='NLTK is a leading platform for building Python programs to work with human language data. It provides easy-to-use interfaces to over 50 corpora and lexical resources such as WordNet, along with a suite of text processing libraries for classification, tokenization, stemming, tagging, parsing, and semantic reasoning, wrappers for industrial-strength NLP libraries, and an active discussion forum.'
+2.문장을 토큰화한다.
+    tokens=nltk.word_tokenize(sentnece)
+    주어진 코퍼스(corpus)에서 토큰(token)이라 불리는 단위로 나누는 작업을 토큰화(tokenization)라고 합니다. 토큰의 단위가 상황에 따라 다르지만, 보통 의미있는 단위로 토큰을 정의합니다. 
+    라고 위키독스에서 말하니 참고하도록 하자.
+3.영어 문장 품사 태깅(POS tagging)하기 (POS:Part of Speech)
+    nltk.pos_tag(tokens)
+    할 경우 요소들을 ('interfaces', 'NNS') 이런식으로 가지는 2차원배열 리스트를 뱉어낸다.
+    이후 이 태깅된 품사를 이용해 의미있는 산출을 진행한다.
+4.Stopwords제거하기
+    from nltk.corpus import stopwords
+    stopwords란, 불용어로 언어분석 시 의미가 없는 단어이다. 따라서 stopwords들을 제거해주는 과정을 가지도록하자.
+    stopWords=stopwords.words('english') #지원언어목록:stopwords.fields() 로 확인가능하다.
+
+    이 stopwords들이 토큰화한 tokens에 포함되는지 여부를 for문등을 이용해 적절히 필터링하여 불용어들을 걸러내도록 하자!
+
+    만약, stopwords.words()로 기본적으로 제공되는 불용어 이외에 콤마,닷 같은 것들을 불용어 처리하고 싶다면,
+    stopWords.append('제거하고 싶은것')이라고 추가만 해주면 된다.
+
+5.Lemmatizing
+    Lemmatize라는게, 쉽게 말하면 표제어를 추출하는 것이다. (ex cats=cat, better=good, ran=run)
+    우선, WordNetLemmatizer객체를 생성한다.
+    lemmatizer=nltk.wordnet.WordNetLemmatizer()
+    그후, lemmatizer.lemmatize("cats") 같이 해당 단어에 대해 표제어 처리를 진행한다.
+    그런데! 만약에 명사로 ran이라는 단어가 존재한다면 lemmatizer는 표제어 ran을 반환할것이다. 
+    따라서, 필요에 따라 이 단어의 품사를 명시해줄경우 그런 상황을 방지할 수 있다.
+    lemmazier.lemmatize('ran','v')
+
+아래는 전반적인 프로세스이다.
+
+# Stopwords
+stop_words = stopwords.words("english")
+stop_words.append(',')
+stop_words.append('.')#불용어 처리
+
+file = open('moviereview.txt', 'r', encoding='utf-8') # 읽기 형식('r')로 지정하고 인코딩은 'utf-8'로 설정한다
+lines = file.readlines()  # readlines 함수로 텍스트 파일의 내용을 읽어 리스트로 저장한다
+
+sentence = lines[1] 
+tokens = nltk.word_tokenize(sentence)  
+tagged_tokens=nltk.pos_tag(tokens)
+
+# for문을 통해 stopwords 제거와 lemmatization을 수행한다
+lemmas = []  # lemmatize한 결과를 담기 위한 리스트를 생성한다
+for token,pos in tagged_tokens:  
+    
+    if token.lower() not in stop_words:  # 소문자로 변환한 token이 stopwords에 없으면:
+        if pos.startswith('N'): #startswith은 해당 문자열이 특정 문자로 시작하냐고 물어보는 것이다. 여기선 pos에 따라 if 문을 씌운것이다.
+            lemmas.append(lemmatizer.lemmatize(token,pos='n')) #N으로 시작하는 명사일테니, lemmatize시 명사를 n이라고 명시했다.
+        elif pos.startswith('J'):
+            lemmas.append(lemmatizer.lemmatize(token,pos='a'))
+        elif pos.startswith('V'):
+            lemmas.append(lemmatizer.lemmatize(token,pos='v'))
+        else:
+            lemmas.append(lemmatizer.lemmatize(token))
+print('Lemmas of : ' + sentence)  # lemmatize한 결과를 출력한다
+print(lemmas)
